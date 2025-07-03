@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="description" content="The website applies the decision-support framework presented above and aims to support developers in assessing which PPML technique
+		is adequate for their use case and the future users' preferences to guarantee a maximum level of user acceptance for the application.">
+    <meta name="keywords" content="PPML, machine-learning, privacy, decision support, framework, privacy-preserving, user acceptance">
+    <meta name="author" content="Laura Uwira">
+	
+	<title>PPML Decision Support Framework Website Index</title>
+	<style> 
+		body {
+            font-family: Arial, sans-serif;
+			height: 100%;
+            margin: 0;
+            padding: 50px;
+        }
+		.helpSymbol{
+				width: 25px;
+			}
+	
+	</style>
+</head>
+<body>
+	<div id="start-page" >
+		<!--Overview of the decision support framework-->
+		<h2>Decision-Support Framework</h2>
+		<p> This decision-support framework aims to assist developers in selecting the appropriate PPML technique for their 
+		use case in accordance with user preferences. It was originally developed by Löbner et al. (2024)*. </p>
+		<p> The results provide helpful insights for developers for the decision process regarding the PPML technique. </p>
+		<p> On this introductory page, the key concepts of the framework and the functionality of the website are presented. </p>
+		<h3>The Framework</h3>
+		<p>User acceptance criteria are mapped to PPML characteristics in order to determine which characteristics have an 
+		impact on the user acceptance of the technology. The framework uses an importance score for user preferences and an 
+		assignment of weights to different categories of PPML technique characteristics done by developers to calculate a weighted 
+		score for each PPML technique. The scores show which technique suits the use case best in achieving user acceptance. 
+		The following flowchart illustrates the framework's steps and the inherent relationships of inputs and outputs. </p>
+		<img src="images/process.png" id="framework" alt="Framework Flowchart" style="width: 70%; height: auto;">
+		<p>For the mapping of UAC to PPML characteristics, a binary matrix \(F\) is used. <br>
+		\(F_{ij}\in\{0,1\}\) represents the relation of the \(j\)-th UAC with the \(i\)-th PPML characteristic with \(0\) standing
+		for no connection and \(1\) for an influence of the PPML characteristic on the UAC. <br>
+		The UAC scores representing the importance of each UAC are denoted as \(u_j\in[0,1]\) for the score of the \(j\)-th UAC with
+		the condition that \(\sum_{j=0}^{J} u_j = 1\). <br>
+		Each PPML characteristic can have a number of categories \(k\in[0,\infty)\). The matrix \(X_i\) is then the matrix for the
+		\(i\)-th PPML characteristic. The dimension \((m,n)\) represents the categories for the respective PPML characteristic
+		\((m)\) (also \(k\)) and the number of PPML techniques assessed \((n)\) (also \(t\)). If a technique fulfills a PPML 
+		characteristic category (e.g. the PPML technique FL using aggregation, consequently fulfilling the category <i>'Yes'</i> for the
+		<i>'Aggregation'</i> characteristic) \(X_{i,kt} = 1\), otherwise \(0\). <br>
+		A weight vector \(y_i\) assigns weights to the categories of the different PPML characteristics to evaluate them against each
+		other. The weights can be chosen in the range \(y_{i,k}\in[0,1]\). Categories can be exclusive or not, resulting in the following
+		notation:
+
+			\[
+			\forall i:
+			\begin{cases} 
+			\sum_{k=0}^{K} y_{i,k} = 1 \text{  if not exclusive}\\
+			\sum_{k=0}^{K} y_{i,k} \geq 1 \text{  if exclusive}
+			\end{cases}
+			\]
+
+		The user input is then translated into PPML characteristics' scores \(c_i\) for the \(i\)-th PPML characteristic. 
+		This score is the dot product of the user preference scores \(u_j\) and the mapping of UAC to PPML characteristics \(F_{i,j}\):
+
+			\[
+			c_i:= \sum_{j=0}^{J} F_{i,j}u_{j}
+			\]
+
+		Vector \(c\) is then normalised to allow for better comparison of the results: 
+		
+			\[
+			\forall i:\tilde{c_i}:=\frac{c_i}{\sum_{g=0}^{I} c_g}
+			\]
+
+		The resulting ranking of the assessed PPML techniques is presented by the evaluation vector \(e\):
+
+			\[
+			\forall t:e_t := \sum_{i=0}^{I=13} \tilde{c_i} \cdot (X_i^T \cdot y_i)
+			\]
+
+		The highest-ranking PPML technique meets the user preferences best. </p>
+		
+		<!-- Overview of the website functionalities-->
+		<h3>The Website</h3>
+		<p> The website applies the decision-support framework presented above and aims to support developers in assessing which PPML technique
+		is adequate for their use case and the future users' preferences to guarantee a maximum level of user acceptance for the application. </p>
+		<p> The structure of the website is a split-screen. The left side always represents the input side, while the right side
+		of the website immediately shows the recalculated outputs once a change in inputs was made. </p>
+		<h4> The Inputs </h4>
+		<p> The <b>mandatory</b> input for the framework to be applicable is the UAC importance assessment on the first input page. 
+		For this input, the importance of different user acceptance criteria (UAC) has to be determined. The input should reflect
+		the future users' preferences and should be obtained by e.g. interviewing potential users. </p>
+		<p> The second input is the setting of weights for the categories of different PPML characteristics. Developers should assess
+		how beneficial the fulfillment of a certain category by a PPML technique would be for their use case and assign a respective weight.
+		Each weight \(w\) for a category \(i\) has to be chosen from the range \(w_i\in[0,1]\). This means that a high weight assigned 
+		signalizes that this category of the respective characteristic is assessed by the developers as valuable, while a low weight 
+		signalizes little value for the use case. Keep in mind the exclusiveness constraint: Exclusiveness: If the categories for a 
+		PPML characteristic are exclusive, this means that only one category can be applicable for a certain PPML technique. Thus, 
+		the weight of each category can be selected freely in the range \([0,1]\). However, if the categories are not exclusive, this
+		means that multiple categories can be applicable for one PPML technique. To prevent that the score for this characteristics 
+		exceeds 1, the sum of all non-exclusive categories has to be 1, so \(\sum_{i=0}^{I} w_i = 1 \). This input is <b>optional</b>
+		, meaning that default values are given and can be used by developers. </p>
+		<p> As a third input, developers can change the mapping of UAC to PPML characteristics. If a checkbox is ticked, this means 
+		that the respective PPML characteristics influences the particular user acceptance criteria. The original mapping is set as 
+		a default and can be used by developers as this input is <b>optional</b>.
+		<h4> The Outputs </h4>
+		<p> The first output is a heatmap, which illustrates the importance of each PPML characteristic on the final ranking of the PPML 
+		techiques. Darker colors stand for a greater impact. Additionally, a recommendation for an adequate PPML technique for the 
+		inserted inputs is presented at the bottom. </p>
+		<p> In contrast to the one-dimensional, linear heatmap, the second output is multi-dimensional. The radar chart uses categories
+		to assess the performance of the different PPML techniques in these areas. The radar chart value presented for the respective 
+		PPML technique in each of the six groups is the average of all PPML characteristic scores grouped in the respective group. </p>
+		<h4> Additional Functionalities </h4>
+		<p> Each input and output page have their own help page assigned, which can be opened by clicking on the following symbol: &nbsp;
+		<img src="images/question.png" id="helpSymbolLeft" class="helpSymbol" alt="Question Icon"> <br>
+		The help pages support the user in utilizing the website by providing further information, explanations and definitions. </p>
+		<p> There further exist options to save the inputs and to upload previously saved input files. This enables users to save their 
+		changes and continue to work on the later, refine the inputs based on further inquiries or recreate their decision foundation. 
+		JSON-files are used for the download function and, in turn, this file format has to be used for the upload to work out. <br></p>
+		<p> If you want to return to this start page to re-read the introduction or restart the process, click on the symbol: &nbsp;
+		<img src="images/home.png" id="homeButton" alt="Home Button" class="helpSymbol"> <br>
+		However, please note that this will delete all inputs set priorly, so consider saving the current state of inputs before returning to the home page.</p>
+		<center><a href="ppml-decision-support.html"><button id="startButton"> Start </button></a></center>
+		<br>
+		<p><i> * = Löbner, S., Pape, S., Bracamonte, V. & Kittiphop, P. (2024). Which ppml would a user choose? A structured decision support
+		framework for developers to rank ppml techniques based on user acceptance criteria. 
+		In XX.</i></p>
+	</div>
+
+	<script id="MathJax-script" src="js/text-mml-chtml.js"></script>
+</body>
+</html>

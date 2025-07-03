@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="description" content="The website applies the decision-support framework presented above and aims to support developers in assessing which PPML technique
+		is adequate for their use case and the future users' preferences to guarantee a maximum level of user acceptance for the application.">
+    <meta name="keywords" content="PPML, machine-learning, privacy, decision support, framework, privacy-preserving, user acceptance">
+    <meta name="author" content="Laura Uwira">
+	
+	<title>PPML Decision Support Framework Website</title>
+	<link rel="stylesheet" href="css/stylesheet.css">	
+</head>
+<body>
+<div class="container">
+	<!--Error pop-up-->
+	<div id="error-popup" class="hidden">
+		<center><img src="images/errorImage.png" class="errorSymbol" alt="Error Image"></center>
+		<p id="Warning"> Warning!</p>
+		<p id="errorMessage"></p>
+		<button id="errorButton">Dismiss</button>
+	</div>
+	<!--Left side of the split screen website-->
+	<div class="left-side">
+		<br>
+		<!-- Header of the left side -->
+		<div class="header">
+			<div class="buttons">
+				<button id="prevLeftButton">Previous</button>
+				<button id="nextLeftButton" disabled>Next</button>
+				<div id="pageCounterLeft"> </div>
+				<button id="saveButton" disabled>Save</button>
+				<input type="file" id="uploadButton" style="display: none;">
+				<button type="file" id="customButton">Upload Input File</button>
+				<center><span id="fileName" style="color: #44555d; font-size: 10pt;">No file chosen</span></center>
+			</div>
+			<img src="images/question.png" id="helpSymbolLeft" class="helpSymbol" alt="Question Icon">
+		</div>
+		<!-- Help pop-up for heatmap -->
+		<div id="help-popup3" class="hidden">
+			<div id="inner_help-popup_left">
+				<h2> <span class="helpBlue"> Explanations </span></h2>
+				<h3> Color Legend </h3>
+				<img src="images/HeatmapScale.png" alt="Heatmap Color Scale" style="width: auto; height: 50%;"> <br>
+				<h3> Abbreviations PPML techniques </h3>
+				<p><b>FL: </b>federated learning </p>
+				<p><b>FL + LDP: </b>federated learning & local differential privacy </p>
+				<p><b>MDP: </b>metric differential privacy </p>
+				<p><b>SMPC: </b>secure multiparty computation </p>
+				<p><b>HE: </b>homomorphic encryption </p>
+				<center><button id="helpButton"> Close </button></center>
+			</div>
+		</div>
+		<!--Help pop-up for radar chart -->
+		<div id="help-popup4" class="hidden">
+			<div id="inner_help-popup_left">
+				<h2> <span class="helpBlue"> Explanations </span></h2>
+				<h3> Color Legend </h3>
+				<img src="images/RadarScale.png" alt="Radar Chart Color Scale" style="width: auto; height: 50%;"> <br>
+				<h3> Abbreviations PPML techniques </h3>
+				<p><b>FL: </b>federated learning </p>
+				<p><b>FL + LDP: </b>federated learning & local differential privacy </p>
+				<p><b>MDP: </b>metric differential privacy </p>
+				<p><b>SMPC: </b>secure multiparty computation </p>
+				<p><b>HE: </b>homomorphic encryption </p>
+				<h3> Grouping </h3>
+				<p><b>Data Requirements </b> includes: Data Size, Data Quality, Aggregation</p>
+				<p><b>Data Vulnerabilities </b> includes: Location of Raw Data Storage, Sensitive Attributes </p>
+				<p><b> Model Construction </b> includes: Explainability, Location of Computation, Training Method, Training Time </p>
+				<p><b> Model Evaluation </b> includes: Accuracy, Performance </p>
+				<p><b> Privacy </b> includes: Purpose and Access Limitation</p>
+				<p><b> Security </b> includes: Resilience against Attacks, Technical Robustness </p>
+				<p> The radar chart value presented for the respective PPML technique in each of the five groups 
+				is the average of all PPML characteristic scores grouped in the respective group. <p>
+				<br>
+				<p> If desired, you can <b>unselect PPML techniques</b> by clicking on their names in the color legend above the radar chart.
+				This will hide the scores of the unselected techniques in the radar chart, which is particularly useful when comparing
+				a few favored techniques to avoid redundant information. Unselected techniques are indicated in the color legend by a crossed-out name.
+				To reconsider a technique, simply click on its name again to display its results in the radar chart. <p>
+				<center><button id="helpButton"> Close </button></center>
+			</div>
+		</div>
+		
+		<div class="page">
+			<!-- User Input Page-->
+			<div class="heading">
+				<h2> User Input: Assessing the importance of UAC for users &nbsp;</h2> 
+				<small>(mandatory)</small> <br>
+				<div class="explanation">
+					<p> Please assign an importance score to the different user acceptance criteria in the range [0,1] 
+					with 0 representing "<i>not important</i>" and 1 representing "<i>extremely important</i>". 
+					Note that the sum of all importance scores cannot be 0. </p>
+					<p> All sliders need to be set once to enable further functionalities and the calculations resulting in the presentation of the output. 
+					Please use the '<b>Done</b>'-button at the bottom once you are finished with the user input. 
+					It is always possible to go back and revise the input later. </p>
+				</div>
+			</div>
+			<h3> Privacy Concerns</h3>
+			<div class="sliderGroup">
+				<label for="sliderAutomatedDecisionMaking" class="sliderLabel">Automated Decision Making:</label>
+				<input type="range" id="sliderAutomatedDecisionMaking" min="0" max="1" step = "0.01" value="-1" class="slider"><br>
+				<span id="rangeValue" class="slider-value">-1</span><br>
+			</div>
+			<div class="sliderGroup">
+				<label for="sliderUnauthorizedSecondaryUse" class="sliderLabel">Unauthorized Secondary Use:</label>
+				<input type="range" id="sliderUnauthorizedSecondaryUse" min="0" max="1" step = "0.01" value="0" class="slider"><br>
+				<span id="rangeValue" class="slider-value"></span><br>
+			</div>
+			<div class="sliderGroup">
+				<label for="sliderDataBias" class="sliderLabel">Data Bias:</label>
+				<input type="range" id="sliderDataBias" min="0" max="1" step = "0.01" value="0" class="slider"><br>
+				<span id="rangeValue" class="slider-value"></span><br>
+			</div>
+			<div class="sliderGroup">
+				<label for="sliderUnauthorizedAccess" class="sliderLabel">Unauthorized Access:</label>
+				<input type="range" id="sliderUnauthorizedAccess" min="0" max="1" step = "0.01" value="0" class="slider"><br>
+				<span id="rangeValue" class="slider-value"></span><br>
+			</div>
+			
+			<h3> User Experience </h3>
+			<div class="sliderGroup">
+				<label for="sliderEaseOfUse" class="sliderLabel">Ease of Use:</label>
+				<input type="range" id="sliderEaseOfUse" min="0" max="1" step = "0.01" value="0" class="slider"><br>
+				<span id="rangeValue" class="slider-value"></span><br>
+			</div>
+			<div class="sliderGroup">
+				<label for="sliderAdaptability" class="sliderLabel">Adaptability:</label>
+				<input type="range" id="sliderAdaptability" min="0" max="1" step = "0.01" value="0" class="slider"><br>
+				<span id="rangeValue" class="slider-value"></span><br>
+			</div>
+			<div class="sliderGroup">
+				<label for="sliderAvailability" class="sliderLabel">Availability:</label>
+				<input type="range" id="sliderAvailability" min="0" max="1" step = "0.01" value="0" class="slider"><br>
+				<span id="rangeValue" class="slider-value"></span><br>
+			</div>
+			<div class="sliderGroup">
+				<label for="sliderPerformance" class="sliderLabel">Performance:</label>
+				<input type="range" id="sliderPerformance" min="0" max="1" step = "0.01" value="0" class="slider"><br>
+				<span id="rangeValue" class="slider-value"></span><br>
+			</div>
+			
+			<h3> Perceived Data Processing </h3>
+			<div class="sliderGroup">
+				<label for="sliderCollection" class="sliderLabel">Collection:</label>
+				<input type="range" id="sliderCollection" min="0" max="1" step = "0.01" value="0" class="slider"><br>
+				<span id="rangeValue" class="slider-value"></span><br>
+			</div>
+			<div class="sliderGroup">
+				<label for="sliderDataPurpose" class="sliderLabel">Data Purpose:</label>
+				<input type="range" id="sliderDataPurpose" min="0" max="1" step = "0.01" value="0" class="slider"><br>
+				<span id="rangeValue" class="slider-value"></span><br>
+			</div>
+			<div class="sliderGroup">
+				<label for="sliderStorageLocation" class="sliderLabel">Storage Location:</label>
+				<input type="range" id="sliderStorageLocation" min="0" max="1" step = "0.01" value="0" class="slider"><br>
+				<span id="rangeValue" class="slider-value"></span><br>
+			</div>
+			<div class="sliderGroup">
+				<label for="sliderCorrectness" class="sliderLabel">Correctness of Stored data:</label>
+				<input type="range" id="sliderCorrectness" min="0" max="1" step = "0.01" value="0" class="slider"><br>
+				<span id="rangeValue" class="slider-value"></span><br>
+			</div>
+			
+			<h3> Perceived Trustworthiness </h3>
+			<div class="sliderGroup">
+				<label for="sliderLawfulness" class="sliderLabel">Perceived Lawfulness:</label>
+				<input type="range" id="sliderLawfulness" min="0" max="1" step = "0.01" value="0" class="slider"><br>
+				<span id="rangeValue" class="slider-value"></span><br>
+			</div>
+			<div class="sliderGroup">
+				<label for="sliderFairness" class="sliderLabel">Fairness:</label>
+				<input type="range" id="sliderFairness" min="0" max="1" step = "0.01" value="0" class="slider"><br>
+				<span id="rangeValue" class="slider-value"></span><br>
+			</div>
+			<div class="sliderGroup">
+				<label for="sliderTransparency" class="sliderLabel">Transparency:</label>
+				<input type="range" id="sliderTransparency" min="0" max="1" step = "0.01" value="0" class="slider"><br>
+				<span id="rangeValue" class="slider-value"></span><br>
+			</div>
+			<br>
+			<center><button id="doneButton" disabled> Done </button></center><br><br><br>
+		</div>
+		<div class="page">
+			<!-- Developer Input Page-->
+			<div class="heading">
+				<h2> Developer Input: Setting weights for categories &nbsp;</h2> 
+				<small>(optional)</small>
+			</div>
+			<p><b>*</b> = categories not exclusive, sum of weights has to be 1</p>
+			
+			<h3>Location of Raw Data Storage*</h3>
+			<label for="LRDS_loc">Local</label>
+			<input type="number" id="LRDS_loc" class="number-input" min="0" max="1" step="0.05" value="0.5">
+			<label for="LRDS_dis">Distributed</label>
+			<input type="number" id="LRDS_dis" class="number-input" min="0" max="1" step="0.05" value="0.3">
+			<label for="LRDS_cen">Central</label>
+			<input type="number" id="LRDS_cen" class="number-input" min="0" max="1" step="0.05" value="0.2">
+			<h3>Data Size</h3>
+			<label for="DS_min">Below 1,000 samples</label>
+			<input type="number" id="DS_min" class="number-input" min="0" max="1" step="0.05" value="0">
+			<label for="DS_above">Above 1,000 samples</label>
+			<input type="number" id="DS_above" class="number-input" min="0" max="1" step="0.05" value="1">
+			<h3>Data Quality</h3>
+			<label for="DQ_pre">Pre-processed</label>
+			<input type="number" id="DQ_pre" class="number-input" min="0" max="1" step="0.05" value="1">
+			<label for="DQ_raw">Raw</label>
+			<input type="number" id="DQ_raw" class="number-input" min="0" max="1" step="0.05" value="0.8">
+			<h3>Aggregation</h3>
+			<label for="Agg_yes">Yes</label>
+			<input type="number" id="Agg_yes" class="number-input" min="0" max="1" step="0.05" value="0.25">
+			<label for="Agg_no">No</label>
+			<input type="number" id="Agg_no" class="number-input" min="0" max="1" step="0.05" value="1">
+			<h3>Sensitive Attributes*</h3> <p>Note: removed is exclusive, the other categories are not</p>
+			<label for="SA_Pseudo">Pseudonymised</label>
+			<input type="number" id="SA_Pseudo" class="number-input" min="0" max="1" step="0.05" value="0.2">
+			<label for="SA_Obfus">Obfuscated</label>
+			<input type="number" id="SA_Obfus" class="number-input" min="0" max="1" step="0.05" value="0.3">
+			<label for="SA_Encry">Encrypted</label>
+			<input type="number" id="SA_Encry" class="number-input" min="0" max="1" step="0.05" value="0.3"> <br>
+			<label for="SA_Rem">Removed</label>
+			<input type="number" id="SA_Rem" class="number-input" min="0" max="1" step="0.05" value="1">
+			<label for="SA_Heavy">Heavily Processed</label>
+			<input type="number" id="SA_Heavy" class="number-input" min="0" max="1" step="0.05" value="0.2">
+			<h3>Explainability*</h3>
+			<label for="Ex_ante">Ante-hoc methods</label>
+			<input type="number" id="Ex_ante" class="number-input" min="0" max="1" step="0.05" value="0.25">
+			<label for="Ex_post">Post-hoc methods</label>
+			<input type="number" id="Ex_post" class="number-input" min="0" max="1" step="0.05" value="0.25"> <br>
+			<label for="Ex_glob">Global Explainability</label>
+			<input type="number" id="Ex_glob" class="number-input" min="0" max="1" step="0.05" value="0.25">
+			<label for="Ex_local">Local Explainability</label>
+			<input type="number" id="Ex_local" class="number-input" min="0" max="1" step="0.05" value="0.25">
+			<h3>Location of Computation*</h3>
+			<label for="Loc_loc">Local</label>
+			<input type="number" id="Loc_loc" class="number-input" min="0" max="1" step="0.05" value="0.5">
+			<label for="Loc_dis">Distributed</label>
+			<input type="number" id="Loc_dis" class="number-input" min="0" max="1" step="0.05" value="0.3">
+			<label for="Loc_cen">Central</label>
+			<input type="number" id="Loc_cen" class="number-input" min="0" max="1" step="0.05" value="0.2">
+			<h3>Training Method</h3>
+			<label for="TM_sup">Supervised</label>
+			<input type="number" id="TM_sup" class="number-input" min="0" max="1" step="0.05" value="0">
+			<label for="TM_sem">Semi-supervised</label>
+			<input type="number" id="TM_sem" class="number-input" min="0" max="1" step="0.05" value="0"><br>
+			<label for="TM_un">Unsupervised</label>
+			<input type="number" id="TM_un" class="number-input" min="0" max="1" step="0.05" value="0">
+			<label for="TM_rein">Reinforcement</label>
+			<input type="number" id="TM_rein" class="number-input" min="0" max="1" step="0.05" value="0">
+			<h3>Accuracy (F1-score)</h3>
+			<label for="Acc_0">&lt;0.84</label>
+			<input type="number" id="Acc_0" class="number-input" min="0" max="1" step="0.05" value="0">
+			<label for="Acc_8">0.85-0,89</label>
+			<input type="number" id="Acc_8" class="number-input" min="0" max="1" step="0.05" value="0.3">
+			<label for="Acc_9">0.9-0.94</label>
+			<input type="number" id="Acc_9" class="number-input" min="0" max="1" step="0.05" value="0.6">
+			<label for="Acc_1">0.95-1</label>
+			<input type="number" id="Acc_1" class="number-input" min="0" max="1" step="0.05" value="1">
+			<h3>Training Time</h3>
+			<label for="TT_long">&gt;24h</label>
+			<input type="number" id="TT_long" class="number-input" min="0" max="1" step="0.05" value="0.3">
+			<label for="TT_mid">12-24h</label>
+			<input type="number" id="TT_mid" class="number-input" min="0" max="1" step="0.05" value="0.6">
+			<label for="TT_short">&lt;12h</label>
+			<input type="number" id="TT_short" class="number-input" min="0" max="1" step="0.05" value="1">
+			<h3>Performance</h3>
+			<label for="Per_lost">Attention lost: &gt;10s</label>
+			<input type="number" id="Per_lost" class="number-input" min="0" max="1" step="0.05" value="0">
+			<label for="Per_kept">Attention kept: 1.0-10s</label>
+			<input type="number" id="Per_kept" class="number-input" min="0" max="1" step="0.05" value="0.3"><br>	q1
+			<label for="Per_unin">Uninterrupted: 0.1-1.0s</label>
+			<input type="number" id="Per_unin" class="number-input" min="0" max="1" step="0.05" value="0.6">
+			<label for="Per_inst">Instant reaction: &lt;0.1s</label>
+			<input type="number" id="Per_inst" class="number-input" min="0" max="1" step="0.05" value="1">
+			<h3>Resilience against Attacks*</h3>
+			<label for="Res_mod">Model inversion</label>
+			<input type="number" id="Res_mod" class="number-input" min="0" max="1" step="0.05" value="0.5">
+			<label for="Res_mem">Membership inference</label>
+			<input type="number" id="Res_mem" class="number-input" min="0" max="1" step="0.05" value="0.5">
+			<h3>Purpose and Access Limitation*</h3>
+			<label for="PAL_ent">Privacy of data entity</label>
+			<input type="number" id="PAL_ent" class="number-input" min="0" max="1" step="0.05" value="0.25">
+			<label for="PAL_user">Privacy of user</label>
+			<input type="number" id="PAL_user" class="number-input" min="0" max="1" step="0.05" value="0.25"><br>
+			<label for="PAL_mod">Privacy of model</label>
+			<input type="number" id="PAL_mod" class="number-input" min="0" max="1" step="0.05" value="0.25">
+			<label for="PAL_res">Privacy of result</label>
+			<input type="number" id="PAL_res" class="number-input" min="0" max="1" step="0.05" value="0.25">
+			<h3>Technical Robustness</h3>
+			<label for="TR_Pois">Poisoning countermeasures</label>
+			<input type="number" id="TR_Pois" class="number-input" min="0" max="1" step="0.05" value="1">
+			<label for="TR_no">No countermeasures</label>
+			<input type="number" id="TR_no" class="number-input" min="0" max="1" step="0.05" value="0">
+		</div>
+		<div class="page">
+			<!-- Mapping of UAC to PPML Characteristics -->
+			<div class="heading">
+				<h2> Mapping of UAC to PPML Characteristics &nbsp;</h2> 
+				<small>(optional)</small>
+			</div>
+			<table class="table2" id="matrix" style="font-size: 6pt">
+				<tr>
+					<th colspan="16">PPML Characteristics</th>
+				</tr>
+				<tr>
+					<th></th>
+					<th></th>
+					<th>Location of Raw Data Storage </th>
+					<th>Data Size </th>
+					<th>Data Quality </th>
+					<th>Aggregation </th>
+					<th>Sensitive Attributes </th>
+					<th>Explainability </th>
+					<th>Location of Computation </th>
+					<th>Training Method</th>
+					<th>Accuracy</th>
+					<th>Training Time</th>
+					<th>Performance</th>
+					<th>Resilience against Attacks</th>
+					<th>Purpose and Access Limitation</th>
+					<th>Technical Robustness</th>
+				</tr>
+				<tr>
+					<th rowspan="17">
+						<span class="rotate-text">User <br> Acceptance <br> Criteria</span>
+					</th>
+				</tr>
+				<tr>
+					<th>Automated Decision Making</th>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+				</tr>
+				<tr>
+					<th>Unauthorized Secondary Use</th>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+				</tr>
+				<tr>
+					<th>Data Bias</th>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+				</tr>
+				<tr>
+					<th>Unauthorized Access</th>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+				</tr>
+				<tr>
+					<th>Ease of Use</th>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+				</tr>
+				<tr>
+					<th>Adaptability</th>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+				</tr>
+				<tr>
+					<th>Availability</th>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+				</tr>
+				<tr>
+					<th>Performance</th>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+				</tr>
+				<tr>
+					<th>Collection</th>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+				</tr>
+				<tr>
+					<th>Data Purpose</th>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+				</tr>
+				<tr>
+					<th>Storage Location</th>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+				</tr>
+				<tr>
+					<th>Correctness of Stored Data</th>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+				</tr>
+				<tr>
+					<th>Perceived Lawfulness</th>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+				</tr>
+				<tr>
+					<th>Fairness</th>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+				</tr>
+				<tr>
+					<th>Transparency</th>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox" checked></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+					<td><input type="checkbox"></td>
+				</tr>
+			</table>
+		</div>
+	</div>	
+	<!-- Right side of the split screen website-->
+	<div class="right-side">
+		<br>
+		<!-- Header of the right side-->
+		<div class="header2">
+			<div class="header_right-side_left">
+				<div class="buttons">
+					<button id="prevRightButton">Previous</button>
+					<button id="nextRightButton">Next</button>
+					<div id="pageCounterRight"> </div>
+				</div>
+			</div>
+			<div class="header_right-side_right">
+				<a href="index.html"><img src="images/home.png" id="homeButton" alt="Home Button" class="helpSymbol"></a>
+				<img src="images/question.png" id="helpSymbolRight" class="helpSymbol" alt="Question Icon">
+			</div>
+		</div>
+		<!-- Help pop-up for the developer input-->
+		<div id="help-popup1" class="hidden">
+			<div id="inner_help-popup_right">
+				<h2> <span class="helpBlue"> Explanations </span></h2>
+				<h3> Task </h3>
+				<p> Please set weights for the different categories of PPML characteristics to reflect how valueable the fulfillment of this category
+				would be for your use case. This means that a high weight assigned signalizes that this category of the respective characteristic is
+				assessed by the developers as valuable, while a low weight signalizes little value for the use case. Keep in mind the 
+				exclusiveness constraint explained below when setting the weights.</p>
+				<br>
+				<p><b>Exclusiveness: </b> If the categories for a PPML characteristic are exclusive, this means that only one 
+				category can be applicable for a certain PPML technique. Thus, the weight of each category can be selected freely
+				in the range [0,1]. However, if the categories are <b> not </b> exclusive, this means that multiple categories can
+				be applicable for one PPML technique. To prevent that the score for this characteristics exceeds 1, the sum of all 
+				non-exclusive categories has to be 1.</p>
+				<h3> Location of Raw Data Storage </h3>
+				<p> The location where the raw user data is stored. </p>
+				<p><b>Local: </b> stored on the user's device</p>
+				<p><b>Distributed: </b> stored across multiple devices or locations, often over a network (such as the internet) </p>
+				<p><b>Central: </b> stored on a central server within the AI service chain </p>
+				<h3> Data Size </h3>
+				</p> Data size is defined by the number of rows and columns of a dataset. PPML techniques require different sizes
+				of data to achieve a high accuracy. This characteristic indicates whether pre-trained models have to be used.
+				The threshold is a minimum of 1,000 samples to classify as pre-trained. </p>
+				<p><b>Below 1,000 samples: </b> model is not considered pre-trained </p>
+				<p><b>Above or equal to 1,000 samples: </b> model is considered pre-trained as the data size exceeds the threshold </p>
+				<h3> Data Quality </h3>
+				<p> Data quality is influenced by outliers and missing data that cannot be handled well by all algorithms. Further,
+				data quality is influenced by the process of removing, aggregating, obfuscating or changing data for de-identification.
+				There is thus an inverse relation with the characteristic 'Aggregation'.</p>
+				<p><b>Pre-processed: </b> data was processed, e.g. through removing, aggregating, obfuscating or 
+				changing the data for de-identification. </p>
+				<p><b>Raw: </b> data was not processed </p>
+				<h3> Aggregation </h3>
+				<p> Aggregating data is representing statistically the attributes of several data entitis and is only useful in specific 
+				use cases. Aggregation has an inverse relation with 'Data Quality' and 'Accuracy'. </p>
+				<p><b>Yes: </b> aggregation happened on raw data during de-identification </p>
+				<p><b>No: </b> aggregation did not happen on raw data during de-identification </p>
+				<h3> Sensitive Attributes </h3>
+				<p> Plain sensitive data is one of the most important issues in PPML. To prevent the revealing of plain sensitive data, one
+				should differentiate between several fundamental methods. </p>
+				<p><b>Pseudonymised: </b> sensitive attributes replace with pseudonyms, reducing the risk of direct identification 
+				while allowing some level of data utility </p>
+				<p><b>Obfuscated: </b> sensitive attributes are intentionally altered or masked to prevent clear identification,
+				protecting the information from being easily understood </p>
+				<p><b>Encrypted: </b> sensitive attributes are transformed using cryptographic algorithms into unreadble formats,
+					ensuring that only authorized parties with the decryption key can access the original data </p>
+				<p><b>Removed: </b> sensitive attributes entirely deleted from the dataset, best method to break re-identification
+				attacks, but rarely doable if accuracy needs to be high </p>
+				<p><b>Heavily Processed: </b> data processed in a way that the original data is no longer recognisable </p>
+				<h3> Explainability </h3>
+				<p> Explainable results help to employ proper PPML techniques. </p>
+				<p><b>Ante-hoc methods: </b> methods are explainable by default (such as decision trees) </p>
+				<p><b>Post-hoc methods: </b> methods applied after the model was built </p>
+				<p><b>Global Explainability: </b> explain the overall general behavior of the model </p>
+				<p><b>Local Explainability: </b> aim to explain individual, specific decisions </p>
+				<h3> Location of Computation </h3>
+				<p> For simplicity reasons, only three main locations of computation are distinguished. Computation refers to the training of the model. </p>
+				<p><b>Local: </b> computation on local user devices </p>
+				<p><b>Distributed: </b> computation is spread across multiple devices or nodes in a network
+				<p><b>Central: </b> computation on a central server or data center, e.g. cloud computation </p>
+				<h3> Training Method </h3>
+				<p> Not all PPML techniques are suitable for each training method. It has to be accessed whether the selected PPML 
+				techniques are suitable for the respective use case based on the training method used. </p>
+				<p><b>Supervised: </b> training method involves using labeled data where the algorithm lears from input-output pairs
+				to make accurate predictions on new data </p> 
+				<p><b>Semi-supervised: </b> training method combines a small amount of labeled data with a larger amount of 
+				unlabeled data to improve learnig efficiency and accuracy </p>
+				<p><b>Unsupervised: </b> training method uses only unlabeled data, focusing on identifying patterns and structures
+					within data without predefined labels </p> 
+				<p><b>Reinforcement: </b> training method involves an agent learning to make decisions by receiving rewards or 
+				penalties based on its actions within an environment to maximize cumulative rewards </p> 
+				<h3> Accuracy (F1-Score) </h3>
+				<p> An accuracy threshold for the suitable accuracy metric is defined. If a model in combination with the PPML technique
+				is not able to achieve the threshold, the PPML should not be considered further. The F1-score was used to categorize models. </p>
+				<p><b>&lt; 0.84: </b> F1-score below 0.84 </p>
+				<p><b>0.85 - 0.89: </b> F1-score between 0.85 and 0.89 </p>
+				<p><b>0.9 - 0.94: </b> F1-score between 0.9 and 0.94 </p>
+				<p><b>0.95 - 1: </b> F1-score between 0.95 and 1, with 1 being the maximum score achieveable </p>
+				<h3> Training Time </h3>
+				<p> Training time influences the adaptability of a PPML model and depends on the computational complexity of the 
+				training task. It is very hard to compare between different approachs because the complexity of models, data sets, 
+				computational resources and parties involved differ. </p>
+				<p><b>&gt;24h: </b> training time above 24 hours required </p>
+				<p><b>12 - 24h: </b> trainig time between 12 and 24 hours </p>
+				<p><b>&lt;12h: </b> training time below 12 hours </p>
+				<h3> Performance </h3>
+				<p> The overall runtime of an application, i.e. the time between user request and response. 
+				<p><b>Attention lost: &gt;10s: </b> reaction time above 10s, attention is no longer kept as threshold is exceeded </p>
+				<p><b>Attention kept: 1.0 - 10s: </b> reaction time between 1.0s and 10s, with the latter being the threshold of 
+					keeping the attention on the dialogue between application and user </p>
+				<p><b>Uninterrupted: 0.1 - 1.0s: </b> reaction time between 0.1 and 1.0s, with the latter being the threshold where
+				a delay is noticed but the flow of the user's thoughts is uninterrupted </p>
+				<p><b>Instant reaction: &lt;0.1s </b> reaction time is below 0.1s, this is perceived as an instant reaction of the system </p>
+				<h3> Resilience against Attacks </h3>
+				<p> For this characteristic, the perspective of "globally private" is used, referring to attackers external to the
+				AI service chain. Only attacks which leak information to an exteral adversary are considered under this characteristic. 
+				It reflects whether the considered PPML approach is resilient against the respective type of attack. </p>
+				<p><b>Model inversion: </b> attack where adversary uses access to a trained model to infere sensitive input data by
+				working backwards from the model's output </p>
+				<p><b>Membership inference: </b> attack where the adversary determines whether a specific data point was part of the
+				training dataset used to build the model by analyzing the model's responses </p>
+				<h3> Purpose and Access Limitation </h3>
+				<p> For this characteristic, the perspective of "locally private" is considered, refering to attackers inside the AI service chain. 
+				Each member of the AI service chain needs some access to data in order to fulfill their task. For this characteristic, it is 
+				therefore evaluated whether the PPML method implements countermeasures to protect each of the respective data layers to ensure members
+				of the AI service chain do not use the data for other purposes than intended. </p>
+				<p><b>Privacy of Data Entity: </b> information about data entities (user providing data to train ML model)
+				is protected from unauthorized access and disclosure </p>
+				<p><b>Privacy of User: </b> personal activities and information of user (person using the application) is protected </p>
+				<p><b>Privacy of Model: </b> intellectual property and proprietary details of the ML model itself are protected </p>
+				<p><b>Privacy of Result: </b> outcomes or predictions generated by the model are protected </p>
+				<h3> Technical Robustness </h3>
+				<p> Technical Robustness should ensure that even with potential changes in the operating environment or the context of the model 
+				the PPML behaves reliable during the whole AI life cycle. It means that models are reliable and robust against changes and 
+				minimises unexpected and unintentional behavior. The focus lies on the susceptibility to adversial attacks, namely model poisoning. </p>
+				<p> In model poisoning attacks, the adversary tries to change the model's prediction by polluting the model with 
+				manipulated input data. The attack can be targeted to achieve a certain classification result or untargeted, just
+				polluting the model and lowering its accuracy </p>
+				<p><b>Poisoning Countermeasures: </b> countermeasures against model poisoning attacks exist </p>
+				<p><b>No Countermeasures: </b> no countermeasures against model poisoning attacks are implemented </p> 
+				<center> <button id="helpButton"> Close </button></center>
+			</div>
+		</div>
+		<!-- Help pop-up for the user input-->
+		<div id="help-popup2" class="hidden">
+			<div id="inner_help-popup_right">
+				<h2> <span class="helpBlue"> Explanations </span></h2>
+				<h3> Task </h3>
+				<p> Please assess how important the following criteria are for the future users of the PPML service that shall be provided. 
+				This can e.g. be determined by interviewing potential users. </p>
+				<p> Please assign an importance score to the different user acceptance criteria in the range \([0,1]\) 
+				with \(0\) representing "<i>not important</i>" and \(1\) representing "<i>extremely important</i>". 
+				Note that the sum of all importance scores cannot be \(0\). </p>
+				<p> All sliders need to be set once to enable further functionalities and the calculations resulting in the presentation of the output. 
+				Please use the 'Done'-button once you are finished with the user input. 
+				It is always possible to go back and revise the input later. </p>
+				<br>
+				<h3> Privacy Concerns </h3>
+				<p> The security of personal data is important when using the PPML technique. 
+				Nobody should continue to use the data without consent, 
+				falsify the data or grant unauthorized persons access to the data.</p>
+				<p><b>Automated Decision Making: </b> Concern that with automated decision-making through algorithms, 
+				the process becomes out of control and humans are treated as numbers rather than individuals. </p>
+				<p><b>Unauthorized Secondary Use: </b> Concern of a misuse of data initially collected for a certain purpose
+				for a different purpose without consent/authorization. </p>
+				<p><b>Data Bias: </b> Concern that unrepresentative data might lead to false results. </p>
+				<p><b>Unauthorized Access: </b> Concern that unauthorized people can access personal data. </p>
+				<h3> User Experience </h3>
+				<p> The user experience plays an important role in the usage of PPML techniques. </p>
+				<p><b>Ease of Use: </b> The technology is easy to use. </p>
+				<p><b>Adaptability: </b>The technology can adapt to diverging circumstances, such as changes in location or daytime.</p>
+				<p><b>Availability: </b>The technology can be used anytime when needed.</p>
+				<p><b>Performance: </b>The technology's use will benefit me for my tasks. </p>
+				<h3>Perceived Data Processing</h3>
+				<p>It is important how data is processed, namely answering the questions about what the data is used for, 
+				how it is collected, whether the data is stored correctly and for which purpose.</p>
+				<p><b>Collection: </b>Concern that amount of personal data collected and stored is excessive.</p>
+				<p><b>Data Purpose: </b>Concern that the purpose of the data collection of personal data is not clear, legitimate and precise. </p>
+				<p><b>Storage Location: </b>The geographical location of data storage and the architecture of storing the data is concerning. 
+				The transfer of data across geographical borders might reveal personal data.</p>
+				<p><b>Correctness of Stored Data: </b>Concern that the stored data is flawed or contains wrong information.</p>
+				<h3>Preceived Trustworthiness</h3>
+				<p>The technology used has to be trustworthy. Crucial factors are the efficiency, integrity and the indicated goodwill.
+				The technology has to act conforming to the law, fair and transparent.</p>
+				<p><b>Perceived Lawfulness: </b>Data should be processed in accordance with the law.</p>
+				<p><b>Fairness: </b>The technology should represent the interests of all users fair, 
+				moderate unfair imbalances so that no user feels disadvantaged or exposed.</p>
+				<p><b>Transparency: </b>Degree of transparency about how the technology uses and processes the data, i.e. the right to receive
+				meaningful information about the logic when automated decision-making or profiling is used.</p>
+				<center><button id="helpButton">Close</button></center>
+			</div>
+		</div>
+		<div id="help-popup5" class="hidden">
+			<!-- Help pop-up for the mapping input -->
+			<div id="inner_help-popup_right">
+				<h2> <span class="helpBlue"> Explanations </span></h2>
+				<h3> Task </h3>
+				<p> Please map the user acceptance criteria to the PPML characteristics. The original mapping is presented as an example below. </p>
+				<p> If a checkbox is ticked, this means that the respective PPML characteristics influences the particular user acceptance criteria. </p>
+				<h3> Original Mapping </h3>
+				<p> Set as a default for the mapping matrix: </p>
+				<center><img src="images/OriginalMapping.png" alt="Original UAC to PPML Characteristics Mapping"style="width: 100%; height: auto;" ></center>
+				<p><i><small> Source: Löbner, S., Pape, S., & Bracamonte, V. (2023, August). User acceptance criteria for privacy preserving machine learning techniques. 
+				In Proceedings of the 18th International Conference on Availability, Reliability and Security (pp. 1-8). </small></i></p>
+				<p> Note that only the user shall be considered for this input! </p>
+				<center><button id="helpButton"> Close </button></center>
+			</div>
+		</div>
+		<!-- Heatmap Output -->
+		<div class ="page">
+			<h2> Heatmap Output</h2>
+			<table id="Heatmap">
+				<tr>
+					<th></th>
+					<th>FL</th>
+					<th>FL + LDP</th>
+					<th>MDP</th>
+					<th>SMPC</th>
+					<th>HE</th>
+				</tr>
+				<tr>
+					<th>Location of Raw Data Storage</th>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+				</tr>
+				<tr>
+					<th>Data Size</th>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+				</tr>
+				<tr>
+					<th>Data Quality</th>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+				</tr>
+				<tr>
+					<th>Aggregation</th>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+				</tr>
+				<tr>
+					<th>Sensitive Attributes</th>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+				</tr>
+				<tr>
+					<th>Explainability</th>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+				</tr>
+				<tr>
+					<th>Location of Computation</th>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+				</tr>
+					<tr>
+					<th>Training Method</th>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+				</tr>
+				<tr>
+					<th>Accuracy F1</th>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+				</tr>
+				<tr>
+					<th>Training Time</th>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+				</tr>
+				<tr>
+					<th>Performance</th>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+				</tr>
+				<tr>
+					<th>Resilience Against Attacks</th>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+				</tr>
+				<tr>
+					<th>Purpose & Access Limitation</th>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+				</tr>
+				<tr>
+					<th>Technical Robustness</th>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+					<td>0</td>
+				</tr>
+				<tr class="exclude-style">
+					<th> Final Score </th>
+					<td> 0 </td>
+					<td> 0 </td>
+					<td> 0 </td>
+					<td> 0 </td>
+					<td> 0 </td>
+				</tr>
+			</table>
+		</div>
+		<!--Radar Chart Output-->
+		<div class="page">
+			<h2> Radar Chart </h2>
+			<canvas id="myRadarChart"></canvas>
+		</div>
+	</div>
+</div>
+
+<script src="js/math.min.js"></script>
+<script src="js/chart.js"></script>
+<script id="MathJax-script" src="js/text-mml-chtml.js"></script>
+<script src="js/downloadValues.js"></script>
+<script src="js/uploadValues.js"></script>
+<script src="js/radarChart.js"></script>
+<script src="js/heatMap.js"></script>
+<script>
+	var table = document.getElementById("Heatmap");
+	var cells = document.querySelectorAll('#Heatmap td');
+	var rows = table.getElementsByTagName('tr');
+	var sliders = document.querySelectorAll('.slider');
+	var devInputs = document.querySelectorAll('.number-input');
+	var helpButtons = document.querySelectorAll('#helpButton');
+	var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+
+	//Handle the page functionality of the website
+	document.addEventListener("DOMContentLoaded", () => {
+
+		const pages = document.querySelectorAll(".page");
+		const prevLeftButton = document.getElementById("prevLeftButton");
+		const nextLeftButton = document.getElementById("nextLeftButton");
+		const prevRightButton = document.getElementById("prevRightButton");
+		const nextRightButton = document.getElementById("nextRightButton");
+		const helpSymbolLeft = document.getElementById("helpSymbolLeft");
+		const helpSymbolRight = document.getElementById("helpSymbolRight");
+		const pageCounterLeft = document.getElementById('pageCounterLeft');
+		const pageCounterRight = document.getElementById('pageCounterRight');
+		const homeButtons = document.querySelectorAll('#homeButton');
+		
+		
+		prevLeftButton.disabled = true;
+		prevRightButton.disabled = true;
+
+		let currentLeftPage = 0;
+		let currentRightPage = 3;
+		
+		//Update page counter shown in header
+		const updatePage = () => {
+			pageCounterLeft.innerHTML = "page: " + (currentLeftPage + 1) + "/3"; 
+			pageCounterRight.innerHTML = "page: " + (currentRightPage - 2) + "/2";
+		};
+
+		//Page functionality
+		const showPage = (index1, index2) => {
+			pages.forEach((page, i) => {
+				page.classList.toggle("active", i === index1 || i === index2 );
+			});
+			updatePage();
+		};
+
+		//Use of previous button on the left side
+		prevLeftButton.addEventListener("click", () => {
+			if (currentLeftPage > 0) {
+				currentLeftPage--;
+				showPage(currentLeftPage, currentRightPage);
+			} 
+			nextLeftButton.disabled = false;
+			if (currentLeftPage === 0) {
+				prevLeftButton.disabled = true;
+			}
+		});
+
+		//Use of next button on the right side
+		nextLeftButton.addEventListener("click", () => {
+			if (currentLeftPage < pages.length - 1-2) {
+				currentLeftPage++;
+				showPage(currentLeftPage, currentRightPage);
+			}
+			prevLeftButton.disabled = false;
+			if (currentLeftPage === pages.length - 1-2) {
+				nextLeftButton.disabled = true;
+			}
+		});
+		
+		//Use of help symbol on the left side
+		helpSymbolLeft.addEventListener("click", () => {
+			if (currentLeftPage === 0) {
+				//User Input help
+				document.getElementById('help-popup2').classList.remove('hidden');
+			} else if (currentLeftPage === 1) {
+				//Developer Input help
+				document.getElementById('help-popup1').classList.remove('hidden');
+			} else {
+				//Mapping help
+				document.getElementById('help-popup5').classList.remove('hidden'); 
+			}
+		});
+		
+		//Close help pages
+		helpButtons.forEach(function(helpButton) { 
+			helpButton.addEventListener("click", () => {
+				document.getElementById('help-popup1').classList.add('hidden');
+				document.getElementById('help-popup2').classList.add('hidden');
+				document.getElementById('help-popup3').classList.add('hidden');
+				document.getElementById('help-popup4').classList.add('hidden');
+				document.getElementById('help-popup5').classList.add('hidden');
+			});
+		});
+		
+		//Use of previous button right
+		prevRightButton.addEventListener("click", () => {
+			if (currentRightPage > 3) {
+				currentRightPage--;
+				showPage(currentLeftPage, currentRightPage);
+			}
+			prevRightButton.disabled=true;
+			nextRightButton.disabled = false;
+		});
+
+		//Use of next button right
+		nextRightButton.addEventListener("click", () => {
+			if (currentRightPage < pages.length - 1) {
+				currentRightPage++;
+				showPage(currentLeftPage, currentRightPage);
+			}
+			prevRightButton.disabled = false;
+			nextRightButton.disabled = true;
+		});
+		
+		
+		//Use of help symbol right
+		helpSymbolRight.addEventListener("click", () => {
+			if (currentRightPage === 3) {
+				document.getElementById('help-popup3').classList.remove('hidden');
+				 //Erklärung Heatmap
+			} else {
+				document.getElementById('help-popup4').classList.remove('hidden');
+				//Erklärung Spinnendiagramm
+			}
+		});
+
+		// Start by showing the first page
+		showPage(currentLeftPage, currentRightPage);
+
+	});
+	
+	//Click upload button using the custom button
+	document.getElementById('customButton').addEventListener('click', function() {
+		document.getElementById('uploadButton').click();
+	});
+
+	
+	function updateValue(input,valueSpan) {
+		valueSpan.textContent = input.value;
+		valueSpan.style.display = 'inline-block';
+		valueSpan.style.visibility = 'visible';
+		doneButton.disabled = false;
+		nextLeftButton.disabled = false;
+		saveButton.disabled = false;
+	}
+	
+	function checkAllSlidersUsed() {
+			const allSet = Object.values(sliderStatus).every(status => status === true);
+			if (allSet) {
+				doneButton.disabled = false;
+				nextLeftButton.disabled = false;
+				saveButton.disabled = false;
+			} else {
+				doneButton.disabled = true;
+				nextLeftButton.disabled = true;
+				saveButton.disabled = true;
+			}
+	}
+		
+	const sliderStatus = {};
+	
+	//Slider functionality
+	sliders.forEach(function(slider) {
+		const valueSpan = (slider.nextElementSibling).nextElementSibling;
+		valueSpan.textContent = slider.value;
+	
+		//Update slider value shown next to slider
+        function updateValue() {
+            valueSpan.textContent = slider.value;
+        }
+
+        updateValue();
+		
+		
+		//Set initial value
+		document.querySelectorAll('.slider').forEach(slider => {
+			sliderStatus[slider.id] = false;
+		});
+		
+		//Update value for slider once set
+		function handleSliderInput (event) {
+			sliderStatus[event.target.id] = true;
+			checkAllSlidersUsed();
+		}
+		
+		
+		//Check whether all sliders have been used and allow further actions once all sliders are set
+		checkAllSlidersUsed();
+		/*function checkAllSlidersUsed() {
+			const allSet = Object.values(sliderStatus).every(status => status === true);
+			if (allSet) {
+				doneButton.disabled = false;
+				nextLeftButton.disabled = false;
+				saveButton.disabled = false;
+			} else {
+				doneButton.disabled = true;
+				nextLeftButton.disabled = true;
+				saveButton.disabled = true;
+			}
+		}*/
+			
+		//On slider input handle the input
+		document.querySelectorAll('.slider').forEach(slider => {
+			slider.addEventListener('input', handleSliderInput);
+		});
+		
+		//On slider input update value
+		slider.addEventListener('input', function() {
+			updateValue();
+			valueSpan.style.display = 'inline-block';
+			valueSpan.style.visibility = 'visible';
+		});
+		
+	});
+	
+	//On click activate calculations
+	document.getElementById("doneButton").addEventListener('click', function() {
+		checkSums();
+	});
+	
+	//On click activate calculations
+	document.getElementById("nextLeftButton").addEventListener('click', function () {
+		checkSums();
+	});
+	
+	//On click activate calculations
+	document.getElementById("saveButton").addEventListener('click', function () {
+		checkSums();
+	});
+	
+	//On input activate calculations
+	devInputs.forEach(function(devInput){
+		devInput.addEventListener('input', function() {
+			checkSums();
+		});
+	});
+	
+	//On input activate calculations
+	checkboxes.forEach(function(checkbox){
+		checkbox.addEventListener('change', function(){
+			checkSums();
+		});
+	});
+		
+	//Function for error pop-up
+	function showError(message, timeout = 3000) {
+		const popup = document.getElementById('error-popup');
+		const errorMessage = document.getElementById('errorMessage');
+		
+		errorMessage.innerHTML = message;
+		popup.classList.remove('hidden');
+		popup.style.opacity = '1';
+		
+		errorButton.addEventListener("click", () => {
+				popup.classList.add('hidden');
+				popup.style.opacity = '0';
+			});
+	}
+</script>
+</body>
+</html>
